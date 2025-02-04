@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+
+    <style>
+        .textarea-dark {
+            resize: none;
+            padding-top: 18px;
+            outline: none !important;
+            box-shadow: none !important;
+        }
+
+        .headline {
+            display: inline;
+            position: relative;
+            letter-spacing: -5px;
+            color: #3e3e3e;
+            cursor: text;
+            font: 54px Helvetica, Sans-Serif;
+        }
+
+        @media screen and (min-width: 768px) {
+            .headline {
+                font-size: 70px;
+            }
+        }
+
+        .subline {
+            font-size: 30px;
+            position: relative;
+            max-width: 320px;
+            margin: 0 auto;
+            top: -14px;
+        }
+
+        @media screen and (min-width: 768px) {
+            .subline {
+                top: -16px;
+            }
+        }
+
+        .subline:after {
+            content: "";
+            width: 4px;
+            height: 2px;
+            background: #000;
+            width: 100%;
+            position: absolute;
+            left: -50%;
+            transform: translateX(50%);
+            top: 26px;
+        }
+
+        .subline-text {
+            background: #fff;
+            display: inline;
+            z-index: 1;
+            position: relative;
+            padding: 0 23px;
+        }
+
+        .textarea-headline {
+            position: absolute;
+            top: -12px;
+            background: #fff;
+            width: auto;
+            left: 12px;
+            font-weight: 700;
+            border-top: 1px solid #CED4DA;
+            border-radius: 10px;
+            padding: 0 10px;
+        }
+
+        .textarea-dark:focus ~ .textarea-headline {
+            border-top: 1px solid #86B7FE;
+        }
+    </style>
+
+    <title>Shopware Plugin List Comparison</title>
+</head>
+<body>
+    <div class="container">
+        <div class="text-center mt-4">
+            <span class="headline">Shopware Plugin List Comparison</span>
+            <div class="subline">
+                <div class="subline-text">
+                    ∞
+                </div>
+            </div>
+        </div>
+
+        <div class="position-relative mt-3">
+            <textarea class="form-control textarea-dark" rows="10" data-staging-list></textarea>
+            <div class="textarea-headline">Staging</div>
+        </div>
+
+        <br>
+
+        <div class="position-relative mb-4">
+            <textarea class="form-control textarea-dark" rows="10" data-production-list></textarea>
+            <div class="textarea-headline">Production</div>
+        </div>
+
+        <div class="container text-center mt-3 mb-3">
+            <div class="btn btn-primary" data-trigger>Compare</div>
+        </div>
+
+        <div class="container" data-result-container>
+        </div>
+    </div>
+
+    <script>
+        const triggerElement = document.querySelector('[data-trigger]');
+
+        triggerElement.addEventListener('click', () => {
+            const stagingList = parsePlugins(document.querySelector('[data-staging-list]').value);
+            const productionList = parsePlugins(document.querySelector('[data-production-list]').value);
+            const resultContainer = document.querySelector('[data-result-container]');
+
+            const resultHTML = comparePluginLists(stagingList, productionList);
+            resultContainer.innerHTML = resultHTML;
+        });
+
+        function parsePlugins(text) {
+            const lines = text.split("\n").map(line => line.trim()).filter(line => line);
+            const plugins = {};
+            lines.forEach(line => {
+                const parts = line.split(/\s+/);
+                if (parts.length >= 2) {
+                    const name = parts[0];
+                    const version = parts[1];
+                    plugins[name] = version;
+                }
+            });
+            return plugins;
+        }
+
+        function comparePluginLists(staging, production) {
+            let result = '<div class="comparison-results">';
+
+            Object.keys(staging).forEach(plugin => {
+                if (!production[plugin]) {
+                    result += `<div style="color: blue;">🔵 ${plugin} (Staging only, v${staging[plugin]})</div>`;
+                } else if (staging[plugin] !== production[plugin]) {
+                    result += `<div style="color: orange;">🟡 ${plugin} (Staging: v${staging[plugin]} → Production: v${production[plugin]})</div>`;
+                }
+            });
+
+            Object.keys(production).forEach(plugin => {
+                if (!staging[plugin]) {
+                    result += `<div style="color: red;">🔴 ${plugin} (Production only, v${production[plugin]})</div>`;
+                }
+            });
+
+            return result ? result + "</div>" : "<div>No differences found.</div>";
+        }
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.min.js" integrity="sha384-pQQkAEnwaBkjpqZ8RU1fF1AKtTcHJwFl3pblpTlHXybJjHpMYo79HY3hIi4NKxyj" crossorigin="anonymous"></script>
+</body>
+</html>
