@@ -1,3 +1,3 @@
 # Shopware Plugin List Comparison
 
-[Visit GitHub Page](https://ottschoThomas.github.io/shopware-plugin-list-comparison/)
+[Visit GitHub Page](https://ottschothomas.github.io/ShopwarePluginListComparison/)
