@@ -423,25 +423,44 @@
         });
 
         function parsePlugins(text) {
-            const lines = text.split("\n").map(line => line.trim()).filter(line => line);
+            const lines = text.split("\n")
+                .map(line => line.trim())
+                .filter(line => line && !/^-+$/g.test(line)); // ignore empty and separator lines
+        
             const plugins = {};
-
+        
             lines.forEach(line => {
-                // Regex to properly capture plugin name, full version, installed & active states
-                const parts = line.match(/^(\S+)\s+.*?\s+(\d+\.\d+\.\d+)\s+.*?\s+(Yes|No)\s+(Yes|No)/);
-                if (parts) {
-                    const name = parts[1].trim().toLowerCase(); // Normalize name for comparison
-                    const version = parts[2].trim(); // Full version number (e.g., "4.4.0")
-                    const installed = parts[3].trim() === "Yes";
-                    const active = parts[4].trim() === "Yes";
-                    const state = !installed ? "Uninstalled" : active ? "Active" : "Inactive";
-
-                    plugins[name] = { version, state };
-                } else {
-                    console.warn(`Skipped line (format issue): "${line}"`);
+                // split into columns by two or more spaces (table output separates columns that way)
+                const cols = line.split(/\s{2,}/).map(c => c.trim()).filter(Boolean);
+        
+                // try to find the technical plugin name (vendor/slug like "ott/base")
+                const slugIndex = cols.findIndex(c => /^[a-z0-9_.-]+\/[a-z0-9_.-]+$/i.test(c));
+        
+                if (slugIndex === -1) {
+                    console.warn(`Skipped line (no slug found): "${line}"`);
+                    return;
                 }
+        
+                // human friendly name is usually the first column
+                const displayName = cols[0] || cols[slugIndex];
+        
+                // version column is usually the column right after the slug — take first token (handles "1.5.6 1.5.7")
+                const versionCol = (cols[slugIndex + 1] || "").trim();
+                const version = (versionCol.split(/\s+/)[0]) || "";
+        
+                // collect all explicit Yes/No tokens in the row (order in plugin:list is usually Installed, Active, Up-to-date, Configurable)
+                const yesNoTokens = cols.filter(c => /^(Yes|No)$/i.test(c));
+        
+                const installed = yesNoTokens[0] ? /^yes$/i.test(yesNoTokens[0]) : false;
+                const active =  yesNoTokens[1] ? /^yes$/i.test(yesNoTokens[1]) : false;
+        
+                const state = !installed ? "Uninstalled" : (active ? "Active" : "Inactive");
+        
+                // use slug as the lookup key (normalized)
+                const slug = cols[slugIndex].toLowerCase();
+                plugins[slug] = { displayName, version, state, rawCols: cols };
             });
-
+        
             return plugins;
         }
 
