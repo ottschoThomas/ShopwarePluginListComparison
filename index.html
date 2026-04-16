@@ -263,331 +263,318 @@
                     color: #fff;
                 }
             }
+
+
         }
     </style>
 
     <title>Shopware Plugin List Comparison</title>
 </head>
 <body>
-    <div class="container mb-5">
-        <div class="text-center mt-4">
-            <span class="headline">Shopware Plugin List Comparison</span>
-            <div class="subline">
-                <div class="subline-text">∞</div>
-            </div>
+<div class="container mb-5">
+    <div class="text-center mt-4">
+        <span class="headline">Shopware Plugin List Comparison</span>
+        <div class="subline">
+            <div class="subline-text">∞</div>
         </div>
-
-        <div class="position-relative mt-3">
-            <textarea class="form-control textarea-dark blue" rows="10" data-staging-list></textarea>
-            <div class="textarea-headline blue">Staging</div>
-        </div>
-
-        <br>
-
-        <div class="position-relative mb-4">
-            <textarea class="form-control textarea-dark red" rows="10" data-production-list></textarea>
-            <div class="textarea-headline red">Production</div>
-        </div>
-
-        <div class="container text-center mt-5 mb-5">
-            <button type="button" class="bubbly-button" data-trigger>
-                Compare
-            </button>
-        </div>
-
-        <div class="w-100 text-center d-none" data-actions-container>
-            <button id="saveAsPdf" class="btn btn-danger">
-                Save as PDF
-            </button>
-        </div>
-
-        <div data-result-container></div>
     </div>
 
-    <template id="template-staging-only-base">
-        <div class="card staging mt-5 mb-3">
-            <div class="card-header">Staging only</div>
-            <div class="card-body">
-                <table class="table">
-                    <thead>
-                    <tr>
-                        <th scope="col">#</th>
-                        <th scope="col">Plugin Name</th>
-                        <th scope="col">Version</th>
-                        <th scope="col">State</th>
-                    </tr>
-                    </thead>
-                    <tbody data-body>
-                    </tbody>
-                </table>
-            </div>
+    <div class="position-relative mt-3">
+        <textarea class="form-control textarea-dark blue" rows="10" data-staging-list></textarea>
+        <div class="textarea-headline blue">Staging</div>
+    </div>
+
+    <br>
+
+    <div class="position-relative mb-4">
+        <textarea class="form-control textarea-dark red" rows="10" data-production-list></textarea>
+        <div class="textarea-headline red">Production</div>
+    </div>
+
+    <div class="container text-center mt-5 mb-5">
+        <button type="button" class="bubbly-button" data-trigger>
+            Compare
+        </button>
+    </div>
+
+    <div class="w-100 text-center d-none" data-actions-container>
+        <button id="saveAsPdf" class="btn btn-danger">
+            Save as PDF
+        </button>
+    </div>
+
+    <div data-result-container></div>
+</div>
+
+<template id="template-staging-only-base">
+    <div class="card staging mt-5 mb-3">
+        <div class="card-header">Staging only</div>
+        <div class="card-body">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Plugin Name</th>
+                    <th scope="col">Version</th>
+                    <th scope="col">State</th>
+                </tr>
+                </thead>
+                <tbody data-body>
+                </tbody>
+            </table>
         </div>
-    </template>
+    </div>
+</template>
 
-    <template id="template-production-only-base">
-        <div class="card production mt-5 mb-5">
-            <div class="card-header">Production only</div>
-            <div class="card-body">
-                <table class="table">
-                    <thead>
-                    <tr>
-                        <th scope="col">#</th>
-                        <th scope="col">Plugin Name</th>
-                        <th scope="col">Version</th>
-                        <th scope="col">State</th>
-                    </tr>
-                    </thead>
-                    <tbody data-body>
-                    </tbody>
-                </table>
-            </div>
+<template id="template-production-only-base">
+    <div class="card production mt-5 mb-5">
+        <div class="card-header">Production only</div>
+        <div class="card-body">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Plugin Name</th>
+                    <th scope="col">Version</th>
+                    <th scope="col">State</th>
+                </tr>
+                </thead>
+                <tbody data-body>
+                </tbody>
+            </table>
         </div>
-    </template>
+    </div>
+</template>
 
-    <template id="template-staging-production-only-row">
-        <tr>
-            <th scope="row"></th>
-            <td data-name></td>
-            <td data-version></td>
-            <td data-state></td>
-        </tr>
-    </template>
+<template id="template-staging-production-only-row">
+    <tr>
+        <th scope="row"></th>
+        <td data-name></td>
+        <td data-version></td>
+        <td data-state></td>
+    </tr>
+</template>
 
-    <template id="template-version-mismatch-base">
-        <div class="card version-mismatch mt-5 mb-5">
-            <div class="card-header">Version mismatch</div>
-            <div class="card-body">
-                <table class="table">
-                    <thead>
-                    <tr>
-                        <th scope="col">#</th>
-                        <th scope="col">Plugin Name</th>
-                        <th scope="col">Staging Version</th>
-                        <th scope="col">Staging State</th>
-                        <th scope="col">Production Version</th>
-                        <th scope="col">Production State</th>
-                    </tr>
-                    </thead>
-                    <tbody data-body>
-                    </tbody>
-                </table>
-            </div>
+<template id="template-version-mismatch-base">
+    <div class="card version-mismatch mt-5 mb-5">
+        <div class="card-header">Version / State mismatch</div>
+        <div class="card-body">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Plugin Name</th>
+                    <th scope="col">Staging Version</th>
+                    <th scope="col">Staging State</th>
+                    <th scope="col">Production Version</th>
+                    <th scope="col">Production State</th>
+                </tr>
+                </thead>
+                <tbody data-body>
+                </tbody>
+            </table>
         </div>
-    </template>
+    </div>
+</template>
 
-    <template id="template-version-mismatch-row">
-        <tr>
-            <th scope="row"></th>
-            <td data-name></td>
-            <td data-staging-version></td>
-            <td data-staging-state></td>
-            <td data-production-version></td>
-            <td data-production-state></td>
-        </tr>
-    </template>
+<template id="template-version-mismatch-row">
+    <tr>
+        <th scope="row"></th>
+        <td data-name></td>
+        <td data-staging-version></td>
+        <td data-staging-state></td>
+        <td data-production-version></td>
+        <td data-production-state></td>
+    </tr>
+</template>
 
-    <template id="template-no-differences">
-        <div class="alert alert-success text-center h5" role="alert">
-            No differences found.
-        </div>
-    </template>
 
-    <script>
-        var animateButton = function(e) {
-            e.preventDefault;
+<template id="template-no-differences">
+    <div class="alert alert-success text-center h5" role="alert">
+        No differences found.
+    </div>
+</template>
+
+<script>
+    var animateButton = function(e) {
+        e.preventDefault;
+        e.target.classList.remove('animate');
+
+        e.target.classList.add('animate');
+        setTimeout(function(){
             e.target.classList.remove('animate');
+        },700);
+    };
 
-            e.target.classList.add('animate');
-            setTimeout(function(){
-                e.target.classList.remove('animate');
-            },700);
-        };
+    var bubblyButtons = document.getElementsByClassName("bubbly-button");
 
-        var bubblyButtons = document.getElementsByClassName("bubbly-button");
+    for (var i = 0; i < bubblyButtons.length; i++) {
+        bubblyButtons[i].addEventListener('click', animateButton, false);
+    }
 
-        for (var i = 0; i < bubblyButtons.length; i++) {
-            bubblyButtons[i].addEventListener('click', animateButton, false);
-        }
+    document.querySelector('[data-trigger]').addEventListener('click', () => {
+        document.querySelector('[data-result-container]').innerHTML = '';
 
-        document.querySelector('[data-trigger]').addEventListener('click', () => {
-            document.querySelector('[data-result-container]').innerHTML = '';
+        const stagingList = parsePlugins(document.querySelector('[data-staging-list]').value);
+        const productionList = parsePlugins(document.querySelector('[data-production-list]').value);
 
-            const stagingList = parsePlugins(document.querySelector('[data-staging-list]').value);
-            const productionList = parsePlugins(document.querySelector('[data-production-list]').value);
-            const resultContainer = document.querySelector('[data-result-container]');
+        console.log("Parsed Staging Plugins:", stagingList);
+        console.log("Parsed Production Plugins:", productionList);
 
-            console.log("Parsed Staging Plugins:", stagingList);
-            console.log("Parsed Production Plugins:", productionList);
+        comparePluginLists(stagingList, productionList);
+    });
 
-            comparePluginLists(stagingList, productionList);
-        });
+    function parsePlugins(text) {
+        const lines = text.split("\n")
+            .map(line => line.trim())
+            .filter(line => line && !/^-+$/g.test(line));
 
-        function parsePlugins(text) {
-            const lines = text.split("\n")
-                .map(line => line.trim())
-                .filter(line => line && !/^-+$/g.test(line)); // ignore empty and separator lines
-        
-            const plugins = {};
-        
-            lines.forEach(line => {
-                // split into columns by two or more spaces (table output separates columns that way)
-                const cols = line.split(/\s{2,}/).map(c => c.trim()).filter(Boolean);
-        
-                // try to find the technical plugin name (vendor/slug like "ott/base")
-                const slugIndex = cols.findIndex(c => /^[a-z0-9_.-]+\/[a-z0-9_.-]+$/i.test(c));
-        
-                if (slugIndex === -1) {
-                    console.warn(`Skipped line (no slug found): "${line}"`);
-                    return;
-                }
-        
-                // human friendly name is usually the first column
-                const displayName = cols[0] || cols[slugIndex];
-        
-                // version column is usually the column right after the slug — take first token (handles "1.5.6 1.5.7")
-                const versionCol = (cols[slugIndex + 1] || "").trim();
-                const version = (versionCol.split(/\s+/)[0]) || "";
-        
-                // collect all explicit Yes/No tokens in the row (order in plugin:list is usually Installed, Active, Up-to-date, Configurable)
-                const yesNoTokens = cols.filter(c => /^(Yes|No)$/i.test(c));
-        
-                const installed = yesNoTokens[0] ? /^yes$/i.test(yesNoTokens[0]) : false;
-                const active =  yesNoTokens[1] ? /^yes$/i.test(yesNoTokens[1]) : false;
-        
-                const state = !installed ? "Uninstalled" : (active ? "Active" : "Inactive");
-        
-                // use slug as the lookup key (normalized)
-                const slug = cols[slugIndex].toLowerCase();
-                plugins[slug] = { displayName, version, state, rawCols: cols };
-            });
-        
-            return plugins;
-        }
+        const plugins = {};
 
-        function comparePluginLists(staging, production) {
-            const stagingOnlyRows = [];
-            const productionOnlyRows = [];
-            const versionMismatchRows = [];
+        lines.forEach(line => {
+            const cols = line.split(/\s{2,}/).map(c => c.trim()).filter(Boolean);
 
-            // Create a unique list of all plugin names (normalized for case differences)
-            const allPlugins = new Set([...Object.keys(staging), ...Object.keys(production)]);
-            let indexOnlyStaging = 0;
-            let indexOnlyProduction = 0;
-            let indexVersionMismatch = 0;
+            const slugIndex = cols.findIndex(c => /^[a-z0-9_.-]+\/[a-z0-9_.-]+$/i.test(c));
 
-            allPlugins.forEach(plugin => {
-                const stagingData = staging[plugin] || null;
-                const productionData = production[plugin] || null;
-
-                console.log(`Comparing: ${plugin}`, stagingData, productionData);
-
-                if (!productionData) {
-                    indexOnlyStaging += 1;
-
-                    const template = document.querySelector('#template-staging-production-only-row');
-                    const clone = template.content.cloneNode(true);
-                    clone.querySelector('th').textContent = indexOnlyStaging;
-                    clone.querySelector('[data-name]').textContent = plugin;
-                    clone.querySelector('[data-version]').textContent = stagingData.version;
-                    clone.querySelector('[data-state]').textContent = stagingData.state;
-
-                    stagingOnlyRows.push(clone);
-
-                    // blue += `<div style="color: blue;">🔵 ${plugin} (Only in Staging, v${stagingData.version}, ${stagingData.state})</div>`;
-                } else if (!stagingData) {
-                    indexOnlyProduction += 1;
-
-                    const template = document.querySelector('#template-staging-production-only-row');
-                    const clone = template.content.cloneNode(true);
-                    clone.querySelector('th').textContent = indexOnlyProduction;
-                    clone.querySelector('[data-name]').textContent = plugin;
-                    clone.querySelector('[data-version]').textContent = productionData.version;
-                    clone.querySelector('[data-state]').textContent = productionData.state;
-
-                    productionOnlyRows.push(clone);
-
-                    // red += `<div style="color: red;">🔴 ${plugin} (Only in Production, v${productionData.version}, ${productionData.state})</div>`;
-                } else if (stagingData.version !== productionData.version) {
-                    indexVersionMismatch += 1;
-
-                    const template = document.querySelector('#template-version-mismatch-row');
-                    const clone = template.content.cloneNode(true);
-                    clone.querySelector('th').textContent = indexVersionMismatch;
-                    clone.querySelector('[data-name]').textContent = plugin;
-                    clone.querySelector('[data-staging-version]').textContent = stagingData.version;
-                    clone.querySelector('[data-staging-state]').textContent = stagingData.state;
-                    clone.querySelector('[data-production-version]').textContent = productionData.version;
-                    clone.querySelector('[data-production-state]').textContent = productionData.state;
-
-                    versionMismatchRows.push(clone);
-
-                    // yellow += `<div style="color: orange;">🟡 ${plugin} (Version mismatch: Staging v${stagingData.version} (${stagingData.state}) → Production v${productionData.version} (${productionData.state}))</div>`;
-                }
-            });
-
-            if (
-                !stagingOnlyRows.length
-                && !productionOnlyRows.length
-                && !versionMismatchRows.length
-            ) {
-                const template = document.querySelector('#template-no-differences');
-                const clone = template.content.cloneNode(true);
-
-                document.querySelector('[data-result-container]').appendChild(clone);
-                document.querySelector('[data-actions-container]').classList.add('d-none');
-            } else {
-                document.querySelector('[data-actions-container]').classList.remove('d-none');
-
-                if (stagingOnlyRows.length) {
-                    const template = document.querySelector('#template-staging-only-base');
-                    const clone = template.content.cloneNode(true);
-
-                    stagingOnlyRows.forEach(row => {
-                        clone.querySelector('[data-body]').appendChild(row);
-                    });
-
-                    document.querySelector('[data-result-container]').appendChild(clone);
-                }
-
-                if (productionOnlyRows.length) {
-                    const template = document.querySelector('#template-production-only-base');
-                    const clone = template.content.cloneNode(true);
-
-                    productionOnlyRows.forEach(row => {
-                        clone.querySelector('[data-body]').appendChild(row);
-                    });
-
-                    document.querySelector('[data-result-container]').appendChild(clone);
-                }
-
-                if (versionMismatchRows.length) {
-                    const template = document.querySelector('#template-version-mismatch-base');
-                    const clone = template.content.cloneNode(true);
-
-                    versionMismatchRows.forEach(row => {
-                        clone.querySelector('[data-body]').appendChild(row);
-                    });
-
-                    document.querySelector('[data-result-container]').appendChild(clone);
-                }
+            // No composer slug is fine — we'll key by plugin name instead
+            const displayName = cols[0] || "";
+            if (!displayName) {
+                console.warn(`Skipped line (no plugin name): "${line}"`);
+                return;
             }
 
-            document.querySelector('[data-result-container]').scrollIntoView({
-                behavior: 'smooth',
-            });
+            // Version is a semver-like token (e.g. 4.2.2), find it anywhere in the row
+            const versionToken = cols.find(c => /^v?\d+\.\d+/.test(c));
+            const version = versionToken ? versionToken.split(/\s+/)[0] : "";
 
-            // return `<div class="comparison-results">${yellow}${blue}${red}</div>` || "<div>No differences found.</div>";
+            const yesNoTokens = cols.filter(c => /^(Yes|No)$/i.test(c));
+
+            const installed = yesNoTokens[0] ? /^yes$/i.test(yesNoTokens[0]) : false;
+            const active    = yesNoTokens[1] ? /^yes$/i.test(yesNoTokens[1]) : false;
+
+            const state = !installed ? "Uninstalled" : (active ? "Active" : "Inactive");
+
+            // Use plugin name (first column) as the key, normalized to lowercase
+            const key = displayName.toLowerCase();
+            plugins[key] = { displayName, version, state, rawCols: cols };
+        });
+
+        return plugins;
+    }
+
+    function comparePluginLists(staging, production) {
+        const stagingOnlyRows    = [];
+        const productionOnlyRows = [];
+        const versionMismatchRows = [];
+
+        const allPlugins = new Set([...Object.keys(staging), ...Object.keys(production)]);
+        let indexOnlyStaging      = 0;
+        let indexOnlyProduction   = 0;
+        let indexVersionMismatch  = 0;
+
+        allPlugins.forEach(plugin => {
+            const stagingData    = staging[plugin]    || null;
+            const productionData = production[plugin] || null;
+
+            console.log(`Comparing: ${plugin}`, stagingData, productionData);
+
+            if (!productionData) {
+                // Only in staging
+                indexOnlyStaging += 1;
+                const clone = cloneSimpleRow(indexOnlyStaging, plugin, stagingData);
+                stagingOnlyRows.push(clone);
+
+            } else if (!stagingData) {
+                // Only in production
+                indexOnlyProduction += 1;
+                const clone = cloneSimpleRow(indexOnlyProduction, plugin, productionData);
+                productionOnlyRows.push(clone);
+
+            } else if (stagingData.version !== productionData.version || stagingData.state !== productionData.state) {
+                // Version and/or state mismatch — both land in the same table
+                indexVersionMismatch += 1;
+                const clone = cloneDualRow(
+                    '#template-version-mismatch-row',
+                    indexVersionMismatch,
+                    plugin,
+                    stagingData,
+                    productionData
+                );
+                versionMismatchRows.push(clone);
+            }
+        });
+
+        const hasDifferences =
+            stagingOnlyRows.length ||
+            productionOnlyRows.length ||
+            versionMismatchRows.length;
+
+        if (!hasDifferences) {
+            const template = document.querySelector('#template-no-differences');
+            const clone = template.content.cloneNode(true);
+            document.querySelector('[data-result-container]').appendChild(clone);
+            document.querySelector('[data-actions-container]').classList.add('d-none');
+        } else {
+            document.querySelector('[data-actions-container]').classList.remove('d-none');
+
+            if (stagingOnlyRows.length) {
+                appendTableSection('#template-staging-only-base', stagingOnlyRows);
+            }
+
+            if (productionOnlyRows.length) {
+                appendTableSection('#template-production-only-base', productionOnlyRows);
+            }
+
+            if (versionMismatchRows.length) {
+                appendTableSection('#template-version-mismatch-base', versionMismatchRows);
+            }
         }
 
-        document.getElementById('saveAsPdf').addEventListener('click', function () {
-            html2pdf()
-                .from(document.querySelector('[data-result-container]'))
-                .save('shopware_plugin_list_comparison.pdf')
-            ;
+        document.querySelector('[data-result-container]').scrollIntoView({
+            behavior: 'smooth',
         });
-    </script>
+    }
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.min.js" integrity="sha384-pQQkAEnwaBkjpqZ8RU1fF1AKtTcHJwFl3pblpTlHXybJjHpMYo79HY3hIi4NKxyj" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.js"></script>
+    // Helper: clone a simple (staging-only / production-only) row
+    function cloneSimpleRow(index, pluginKey, data) {
+        const template = document.querySelector('#template-staging-production-only-row');
+        const clone = template.content.cloneNode(true);
+        clone.querySelector('th').textContent = index;
+        clone.querySelector('[data-name]').textContent = data.displayName;
+        clone.querySelector('[data-version]').textContent = data.version;
+        clone.querySelector('[data-state]').textContent = data.state;
+        return clone;
+    }
+
+    // Helper: clone a dual-environment (version/state mismatch) row
+    function cloneDualRow(templateSelector, index, pluginKey, stagingData, productionData) {
+        const template = document.querySelector(templateSelector);
+        const clone = template.content.cloneNode(true);
+        clone.querySelector('th').textContent = index;
+        clone.querySelector('[data-name]').textContent = stagingData.displayName || productionData.displayName;
+        clone.querySelector('[data-staging-version]').textContent = stagingData.version;
+        clone.querySelector('[data-staging-state]').textContent = stagingData.state;
+        clone.querySelector('[data-production-version]').textContent = productionData.version;
+        clone.querySelector('[data-production-state]').textContent = productionData.state;
+        return clone;
+    }
+
+    // Helper: clone a base table template, append rows, and mount to result container
+    function appendTableSection(baseTemplateSelector, rows) {
+        const template = document.querySelector(baseTemplateSelector);
+        const clone = template.content.cloneNode(true);
+        rows.forEach(row => clone.querySelector('[data-body]').appendChild(row));
+        document.querySelector('[data-result-container]').appendChild(clone);
+    }
+
+    document.getElementById('saveAsPdf').addEventListener('click', function () {
+        html2pdf()
+            .from(document.querySelector('[data-result-container]'))
+            .save('shopware_plugin_list_comparison.pdf');
+    });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.min.js" integrity="sha384-pQQkAEnwaBkjpqZ8RU1fF1AKtTcHJwFl3pblpTlHXybJjHpMYo79HY3hIi4NKxyj" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.js"></script>
 </body>
 </html>
