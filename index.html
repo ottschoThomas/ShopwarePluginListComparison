@@ -264,6 +264,112 @@
                 }
             }
         }
+
+        /* Card header holding the title next to the diff filter buttons */
+        .card-header-bar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .diff-filter {
+            display: flex;
+            gap: 6px;
+        }
+
+        .diff-filter-btn {
+            appearance: none;
+            border: 1px solid rgba(255, 255, 255, 0.55);
+            background: rgba(255, 255, 255, 0.15);
+            color: #fff;
+            font-size: 14px;
+            font-weight: 700;
+            line-height: 1;
+            padding: 7px 12px;
+            border-radius: 999px;
+            cursor: pointer;
+            transition: background 0.15s ease-in, color 0.15s ease-in;
+
+            &:hover {
+                background: rgba(255, 255, 255, 0.35);
+            }
+
+            &:focus {
+                outline: 0;
+            }
+
+            &.active {
+                background: #fff;
+                color: #a89a0d;
+                border-color: #fff;
+            }
+
+            .diff-filter-count {
+                opacity: 0.7;
+                font-weight: 400;
+            }
+        }
+
+        /* Value pills: the highlighted one is the reason the row is listed */
+        .cell-value {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 2px 12px;
+            border-radius: 999px;
+            white-space: nowrap;
+
+            &:before {
+                content: '';
+                flex: none;
+                width: 9px;
+                height: 9px;
+                border-radius: 50%;
+                border: 2px solid currentColor;
+            }
+        }
+
+        td.is-same .cell-value {
+            color: rgba(255, 255, 255, 0.6);
+
+            &:before {
+                opacity: 0.5;
+            }
+        }
+
+        td.is-diff .cell-value {
+            background: #fff;
+            color: #1f242e;
+            font-weight: 700;
+
+            &:before {
+                background: #dbc719;
+                border-color: #dbc719;
+            }
+        }
+
+        .diff-legend {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 15px;
+            color: #6c757d;
+            margin-bottom: 12px;
+        }
+
+        .diff-legend-swatch {
+            flex: none;
+            width: 11px;
+            height: 11px;
+            border-radius: 50%;
+            background: #dbc719;
+        }
+
+        [data-diff-row].d-none {
+            display: none !important;
+        }
     </style>
 
     <title>Shopware Plugin List Comparison</title>
@@ -354,9 +460,26 @@
 </template>
 
 <template id="template-version-mismatch-base">
-    <div class="card version-mismatch mt-5 mb-5">
-        <div class="card-header">Version / State mismatch</div>
+    <div class="card version-mismatch mt-5 mb-5" data-mismatch-card>
+        <div class="card-header card-header-bar">
+            <span>Version / State mismatch</span>
+            <div class="diff-filter">
+                <button type="button" class="diff-filter-btn active" data-filter="all">
+                    All <span class="diff-filter-count" data-count></span>
+                </button>
+                <button type="button" class="diff-filter-btn" data-filter="version">
+                    Version <span class="diff-filter-count" data-count></span>
+                </button>
+                <button type="button" class="diff-filter-btn" data-filter="state">
+                    State <span class="diff-filter-count" data-count></span>
+                </button>
+            </div>
+        </div>
         <div class="card-body">
+            <div class="diff-legend">
+                <span class="diff-legend-swatch"></span>
+                Highlighted values differ — they are the reason the plugin is listed here.
+            </div>
             <table class="table">
                 <thead>
                 <tr>
@@ -376,13 +499,13 @@
 </template>
 
 <template id="template-version-mismatch-row">
-    <tr>
+    <tr data-diff-row>
         <th scope="row"></th>
         <td data-name></td>
-        <td data-staging-version></td>
-        <td data-staging-state></td>
-        <td data-production-version></td>
-        <td data-production-state></td>
+        <td data-staging-version><span class="cell-value"></span></td>
+        <td data-staging-state><span class="cell-value"></span></td>
+        <td data-production-version><span class="cell-value"></span></td>
+        <td data-production-state><span class="cell-value"></span></td>
     </tr>
 </template>
 
@@ -524,7 +647,8 @@
             }
 
             if (versionMismatchRows.length) {
-                appendTableSection('#template-version-mismatch-base', versionMismatchRows);
+                const card = appendTableSection('#template-version-mismatch-base', versionMismatchRows);
+                initMismatchFilter(card);
             }
         }
 
@@ -550,11 +674,58 @@
         const clone = template.content.cloneNode(true);
         clone.querySelector('th').textContent = index;
         clone.querySelector('[data-name]').textContent = stagingData.displayName || productionData.displayName;
-        clone.querySelector('[data-staging-version]').textContent = stagingData.version;
-        clone.querySelector('[data-staging-state]').textContent = stagingData.state;
-        clone.querySelector('[data-production-version]').textContent = productionData.version;
-        clone.querySelector('[data-production-state]').textContent = productionData.state;
+
+        const versionDiffers = stagingData.version !== productionData.version;
+        const stateDiffers   = stagingData.state !== productionData.state;
+
+        fillCell(clone, '[data-staging-version]', stagingData.version, versionDiffers);
+        fillCell(clone, '[data-production-version]', productionData.version, versionDiffers);
+        fillCell(clone, '[data-staging-state]', stagingData.state, stateDiffers);
+        fillCell(clone, '[data-production-state]', productionData.state, stateDiffers);
+
+        const row = clone.querySelector('[data-diff-row]');
+        row.dataset.diffVersion = versionDiffers;
+        row.dataset.diffState = stateDiffers;
+
         return clone;
+    }
+
+    // Helper: write a value into a pill and flag whether it is the differing one
+    function fillCell(clone, selector, value, differs) {
+        const cell = clone.querySelector(selector);
+        cell.querySelector('.cell-value').textContent = value || '—';
+        cell.classList.add(differs ? 'is-diff' : 'is-same');
+    }
+
+    // Helper: wire the All / Version / State filter of the mismatch card
+    function initMismatchFilter(card) {
+        const rows = Array.from(card.querySelectorAll('[data-diff-row]'));
+        const matchesFilter = (row, filter) => filter === 'all' || row.dataset['diff' + filter[0].toUpperCase() + filter.slice(1)] === 'true';
+
+        const applyFilter = filter => {
+            let visibleIndex = 0;
+
+            rows.forEach(row => {
+                const visible = matchesFilter(row, filter);
+                row.classList.toggle('d-none', !visible);
+
+                if (visible) {
+                    visibleIndex += 1;
+                    row.querySelector('th').textContent = visibleIndex;
+                }
+            });
+        };
+
+        card.querySelectorAll('[data-filter]').forEach(button => {
+            const filter = button.dataset.filter;
+            button.querySelector('[data-count]').textContent = rows.filter(row => matchesFilter(row, filter)).length;
+
+            button.addEventListener('click', () => {
+                card.querySelectorAll('[data-filter]').forEach(other => other.classList.remove('active'));
+                button.classList.add('active');
+                applyFilter(filter);
+            });
+        });
     }
 
     // Helper: clone a base table template, append rows, and mount to result container
@@ -562,7 +733,11 @@
         const template = document.querySelector(baseTemplateSelector);
         const clone = template.content.cloneNode(true);
         rows.forEach(row => clone.querySelector('[data-body]').appendChild(row));
+
+        const card = clone.firstElementChild;
         document.querySelector('[data-result-container]').appendChild(clone);
+
+        return card;
     }
 
     document.getElementById('saveAsPdf').addEventListener('click', function () {
