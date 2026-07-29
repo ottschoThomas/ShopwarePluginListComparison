@@ -370,6 +370,90 @@
         [data-diff-row].d-none {
             display: none !important;
         }
+
+        .diff-pdf-note {
+            font-size: 15px;
+            font-weight: 400;
+            opacity: 0.85;
+
+            &:empty {
+                display: none;
+            }
+        }
+
+        /* PDF rendering only: html2pdf squeezes the source into the PDF page width,
+           so the six-column mismatch table has to be compact enough to fit —
+           otherwise it overflows and the last column gets clipped off. */
+        .pdf-render {
+            .card {
+                margin-top: 0 !important;
+                margin-bottom: 14px !important;
+            }
+
+            .card-header {
+                font-size: 15px;
+                padding: 8px 12px;
+            }
+
+            .card-body {
+                font-size: 12px;
+                padding: 10px 12px;
+            }
+
+            .diff-pdf-note {
+                font-size: 11px;
+            }
+
+            /* Interactive-only, and meaningless on paper */
+            .diff-filter {
+                display: none;
+            }
+
+            .diff-legend {
+                font-size: 10px;
+                margin-bottom: 6px;
+            }
+
+            .table {
+                margin-bottom: 0;
+            }
+
+            th,
+            td {
+                padding: 4px 8px;
+                vertical-align: middle;
+                word-break: break-word;
+            }
+
+            .cell-value {
+                gap: 5px;
+                padding: 1px 8px;
+
+                &:before {
+                    width: 7px;
+                    height: 7px;
+                    border-width: 1px;
+                }
+            }
+
+            [data-mismatch-card] {
+                .table {
+                    table-layout: fixed;
+                }
+
+                th:nth-child(1) {
+                    width: 4%;
+                }
+
+                th:nth-child(2) {
+                    width: 32%;
+                }
+
+                th:nth-child(n+3) {
+                    width: 16%;
+                }
+            }
+        }
     </style>
 
     <title>Shopware Plugin List Comparison</title>
@@ -462,7 +546,7 @@
 <template id="template-version-mismatch-base">
     <div class="card version-mismatch mt-5 mb-5" data-mismatch-card>
         <div class="card-header card-header-bar">
-            <span>Version / State mismatch</span>
+            <span>Version / State mismatch <span class="diff-pdf-note" data-pdf-note></span></span>
             <div class="diff-filter">
                 <button type="button" class="diff-filter-btn active" data-filter="all">
                     All <span class="diff-filter-count" data-count></span>
@@ -742,9 +826,36 @@
 
     document.getElementById('saveAsPdf').addEventListener('click', function () {
         html2pdf()
-            .from(document.querySelector('[data-result-container]'))
-            .save('shopware_plugin_list_comparison.pdf');
+            .set({
+                margin: 8,
+                filename: 'shopware_plugin_list_comparison.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, backgroundColor: '#ffffff' },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' },
+                pagebreak: { mode: ['css', 'legacy'], avoid: 'tr' }
+            })
+            .from(buildPrintableResult())
+            .save();
     });
+
+    // Build a detached, print-styled copy of the result so the on-screen layout stays untouched
+    function buildPrintableResult() {
+        const printable = document.querySelector('[data-result-container]').cloneNode(true);
+        printable.classList.add('pdf-render');
+
+        // The filter buttons are dropped in print — state the active filter as text instead
+        printable.querySelectorAll('[data-mismatch-card]').forEach(card => {
+            const activeFilter = card.querySelector('.diff-filter-btn.active');
+
+            if (activeFilter && activeFilter.dataset.filter !== 'all') {
+                const filter = activeFilter.dataset.filter;
+                card.querySelector('[data-pdf-note]').textContent =
+                    `— ${filter[0].toUpperCase()}${filter.slice(1)} differences only`;
+            }
+        });
+
+        return printable;
+    }
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.min.js" integrity="sha384-pQQkAEnwaBkjpqZ8RU1fF1AKtTcHJwFl3pblpTlHXybJjHpMYo79HY3hIi4NKxyj" crossorigin="anonymous"></script>
