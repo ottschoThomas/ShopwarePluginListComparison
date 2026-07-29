@@ -193,6 +193,75 @@
             visibility: hidden;
         }
 
+        /* Collapsible "how to" explaining what belongs in the two textareas */
+        .howto {
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 6px;
+            background: rgba(44, 51, 67, 0.85);
+            color: #fff;
+        }
+
+        .howto-summary {
+            cursor: pointer;
+            list-style: none;
+            padding: 10px 16px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+
+            &::-webkit-details-marker {
+                display: none;
+            }
+
+            &:before {
+                content: '▸';
+                font-size: 14px;
+                transition: transform 0.15s ease-in;
+            }
+        }
+
+        .howto[open] .howto-summary:before {
+            transform: rotate(90deg);
+        }
+
+        .howto-body {
+            padding: 0 16px 16px;
+            font-size: 15px;
+
+            ol {
+                padding-left: 20px;
+                margin-bottom: 12px;
+            }
+
+            li + li {
+                margin-top: 6px;
+            }
+
+            code {
+                background: rgba(255, 255, 255, 0.12);
+                color: #fff;
+                padding: 1px 6px;
+                border-radius: 4px;
+            }
+
+            pre {
+                background: #1f242e;
+                color: #d7dde8;
+                border-radius: 4px;
+                padding: 12px;
+                margin: 0;
+                font-size: 12px;
+                overflow-x: auto;
+            }
+        }
+
+        .howto-hint {
+            color: rgba(255, 255, 255, 0.65);
+            font-size: 14px;
+            margin: 10px 0 0;
+        }
+
         .textarea-headline {
             position: absolute;
             top: -12px;
@@ -466,6 +535,27 @@
             <div class="subline-text">∞</div>
         </div>
     </div>
+
+    <details class="howto mt-4 my-5">
+        <summary class="howto-summary">How to — what do I paste in here?</summary>
+        <div class="howto-body">
+            <ol>
+                <li>Run <code>bin/console plugin:refresh</code> on <strong>both</strong> Shopware 6.7 shops (e.g. staging and production).</li>
+                <li>Copy the whole plugin table from the console output. Including the dashed lines is fine.</li>
+                <li>Paste the staging output into the <strong>Staging</strong> field and the production output into the <strong>Production</strong> field, then hit <em>Compare</em>.</li>
+            </ol>
+
+            <p class="mb-2">Example for one of the two fields (shortened to two plugins):</p>
+            <pre>-----------------
+AcrisBundleProductCS    Bundle Produkt     acris/bundle-product    8.8.2    ACRIS E-Commerce GmbH    Yes    Yes    No    No
+Base                    Basis              ott/base                1.6.3    Ottscho-IT, Daniel Naumann    Yes    No    No    No
+-----------------</pre>
+
+            <p class="howto-hint">
+                Paste the raw output, don't reformat it.
+            </p>
+        </div>
+    </details>
 
     <div class="position-relative mt-3">
         <textarea class="form-control textarea-dark blue" rows="10" data-staging-list></textarea>
